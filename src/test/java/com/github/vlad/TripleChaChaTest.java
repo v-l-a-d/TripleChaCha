@@ -83,4 +83,32 @@ public class TripleChaChaTest {
         result = new BigInteger(bytes);
         System.out.println(result.toString());
     }
+
+    @Test
+    public void stats() {
+        TripleChaCha chaCha = new TripleChaCha(keyGenerator.generateKey().getEncoded(), "initVector".getBytes());
+        long[][] counts = new long[15][256];
+
+        for (int ii = 100000; ii < 1000000; ii++) {
+            byte[] bytes = ("val" + ii + "lav").getBytes();
+            chaCha.encrypt(bytes);
+
+            for (int jj = 0; jj < bytes.length; jj++) {
+                counts[jj][bytes[jj] & 0xFF]++;
+            }
+        }
+
+        double expected = 900000 / 256.0;
+
+        for (int ii = 0; ii < counts.length; ii++) {
+            double total = 0.0;
+            for (int jj = 0; jj < counts[ii].length; jj++) {
+                total += Math.abs(expected - counts[ii][jj]);
+            }
+            System.out.println(total / 256.0);
+//            System.out.println(Arrays.toString(counts[ii]));
+
+
+        }
+    }
 }
